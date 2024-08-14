@@ -1,8 +1,8 @@
 mod terminal;
 
 use crossterm::event::{read, Event, Event::Key, KeyCode::Char, KeyEvent, KeyModifiers};
-use crossterm::execute;
-use std::io::stdout;
+/*use crossterm::execute;
+use std::io::stdout;*/
 use terminal::Terminal;
 
 pub struct Editor {
@@ -22,7 +22,6 @@ impl Editor {
     }
      
     fn repl(&mut self) -> Result<(), std::io::Error> {
-        Terminal::move_cursor_to(1,0);
         loop {
             self.refresh_screen()?;
             if self.should_quit {
@@ -60,23 +59,22 @@ impl Editor {
     }
 
     fn draw_rows() -> Result<(), std::io::Error> {
-        // versione nicola
-        // richiede use crossterm::execute;
         let height = Terminal::size()?.1;
-        for current_row in 1..height {
-            Terminal::move_cursor_to(0, current_row - 1)?;
-            print!("~");
-        }
-
         // versione del tutorial
-        /*
-        let height = Terminal::size()?.1;
         for current_row in 0..height {
             print!("~");
             if current_row + 1 < height {
                 print!("\r\n");
             }
+        }
+
+        // versione nicola
+        /*
+        for current_row in 1..height {
+            Terminal::move_cursor_to(0, current_row - 1)?;
+            print!("~");
         }*/
+
         Ok(())
     }
 
