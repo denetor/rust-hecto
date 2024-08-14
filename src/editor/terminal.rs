@@ -33,13 +33,11 @@ impl Terminal {
     }
 
     pub fn hide_cursor() -> Result<(), std::io::Error> {
-        execute!(stdout(), Hide);
-        Ok(())
+        execute!(stdout(), Hide)
     }
 
     pub fn show_cursor() -> Result<(), std::io::Error> {
-        execute!(stdout(), Show);
-        Ok(())
+        execute!(stdout(), Show)
     }
 }
 

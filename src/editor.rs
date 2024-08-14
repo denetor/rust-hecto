@@ -2,8 +2,9 @@ mod terminal;
 
 use crossterm::event::{read, Event, Event::Key, KeyCode::Char, KeyEvent, KeyModifiers};
 use crossterm::style::{Print};
-use crossterm::execute;
+use crossterm::queue;
 use std::io::stdout;
+use std::io::Write;
 use terminal::Terminal;
 
 pub struct Editor {
@@ -49,15 +50,15 @@ impl Editor {
     }
 
     fn refresh_screen(&self) -> Result<(), std::io::Error> {
-        Terminal::hide_cursor();
+        Terminal::hide_cursor()?;
         if self.should_quit {
             Terminal::clear_screen()?;  
             print!("Goodbye.\r\n");
         } else {
-            Self::draw_rows();
+            Self::draw_rows()?;
             Terminal::move_cursor_to(0, 0)?;
         }
-        Terminal::show_cursor();
+        Terminal::show_cursor()?;
         Ok(())
     }
 
@@ -65,11 +66,16 @@ impl Editor {
         let height = Terminal::size()?.1;
         // versione del tutorial
         for current_row in 0..height {
-            execute!(stdout(), Print("~".to_string()));
+            queue!(
+                stdout(), 
+                // ClearType(CurrentLine),
+                Print("~".to_string())
+            )?;
             if current_row + 1 < height {
-                execute!(stdout(), Print("\r\n".to_string()));
+                queue!(stdout(), Print("\r\n".to_string()))?;
             }
         }
+        let _ = stdout().flush();
 
         // versione nicola
         /*
