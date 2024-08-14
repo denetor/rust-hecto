@@ -1,8 +1,9 @@
 mod terminal;
 
 use crossterm::event::{read, Event, Event::Key, KeyCode::Char, KeyEvent, KeyModifiers};
-/*use crossterm::execute;
-use std::io::stdout;*/
+use crossterm::style::{Print};
+use crossterm::execute;
+use std::io::stdout;
 use terminal::Terminal;
 
 pub struct Editor {
@@ -64,9 +65,9 @@ impl Editor {
         let height = Terminal::size()?.1;
         // versione del tutorial
         for current_row in 0..height {
-            print!("~");
+            execute!(stdout(), Print("~".to_string()));
             if current_row + 1 < height {
-                print!("\r\n");
+                execute!(stdout(), Print("\r\n".to_string()));
             }
         }
 
