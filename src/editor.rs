@@ -1,11 +1,8 @@
 mod terminal;
 
 use crossterm::event::{read, Event, Event::Key, KeyCode::Char, KeyEvent, KeyModifiers};
-use crossterm::style::{Print};
-use crossterm::queue;
-use std::io::stdout;
-use std::io::Write;
-use terminal::Terminal;
+use std::io::Error;
+use terminal::{Position, Size, Terminal};
 
 pub struct Editor {
     should_quit: bool,
@@ -23,7 +20,7 @@ impl Editor {
         result.unwrap()
     }
      
-    fn repl(&mut self) -> Result<(), std::io::Error> {
+    fn repl(&mut self) -> Result<(), Error> {
         loop {
             self.refresh_screen()?;
             if self.should_quit {
@@ -49,40 +46,31 @@ impl Editor {
         }
     }
 
-    fn refresh_screen(&self) -> Result<(), std::io::Error> {
+    fn refresh_screen(&self) -> Result<(), Error> {
         Terminal::hide_cursor()?;
         if self.should_quit {
             Terminal::clear_screen()?;  
-            print!("Goodbye.\r\n");
+            Terminal::print("Goodbye.\r\n")?;
         } else {
             Self::draw_rows()?;
-            Terminal::move_cursor_to(0, 0)?;
+            Terminal::move_cursor_to(Position {x: 0, y: 0})?;
         }
         Terminal::show_cursor()?;
+        Terminal::execute()?;
         Ok(())
     }
 
-    fn draw_rows() -> Result<(), std::io::Error> {
-        let height = Terminal::size()?.1;
+    fn draw_rows() -> Result<(), Error> {
+        let Size{height, ..} = Terminal::size()?;
         // versione del tutorial
         for current_row in 0..height {
-            queue!(
-                stdout(), 
-                // ClearType(CurrentLine),
-                Print("~".to_string())
-            )?;
+            Terminal::clear_line()?;
+            Terminal::print("~")?;
+            
             if current_row + 1 < height {
-                queue!(stdout(), Print("\r\n".to_string()))?;
+                Terminal::print("\r\n")?;
             }
         }
-        let _ = stdout().flush();
-
-        // versione nicola
-        /*
-        for current_row in 1..height {
-            Terminal::move_cursor_to(0, current_row - 1)?;
-            print!("~");
-        }*/
 
         Ok(())
     }
