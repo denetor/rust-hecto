@@ -53,6 +53,7 @@ impl Editor {
             Terminal::print("Goodbye.\r\n")?;
         } else {
             Self::draw_rows()?;
+            Self::draw_credits()?;
             Terminal::move_cursor_to(Position {x: 0, y: 0})?;
         }
         Terminal::show_cursor()?;
@@ -71,6 +72,18 @@ impl Editor {
                 Terminal::print("\r\n")?;
             }
         }
+
+        Ok(())
+    }
+
+    // draw the application name centered at 1/3 height of screen
+    fn draw_credits() -> Result<(), Error> {
+        let Size{height, width} = Terminal::size()?;
+        let caption = "Hecto v0.1";
+        let target_row: u16 = (height / 3) as u16;
+        let target_column: u16 = ((width / 2) - (caption.len() as u16 / 2)) as u16;
+        Terminal::move_cursor_to(Position {x: target_column, y: target_row})?;
+        Terminal::print(caption)?;
 
         Ok(())
     }
