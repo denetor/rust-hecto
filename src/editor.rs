@@ -65,10 +65,13 @@ impl Editor {
 
     fn draw_welcome_message() -> Result<(), Error> {
         let mut welcome_message = format!("{NAME} editor -- version {VERSION}");
-        let width = Terminal::size()?.width as usize;
+        let width = Terminal::size()?.width;
         let len = welcome_message.len();
-        let padding = (width - len) / 2;
-        let spaces = " ".repeat(padding - 1);
+         // we allow this since we don't care if our welcome message is put _exactly_ in the middle.
+        // it's allowed to be a bit to the left or right.
+        #[allow(clippy::integer_division)]
+        let padding = (width.saturating_sub(len)) / 2;
+        let spaces = " ".repeat(padding.saturating_sub(1));
         welcome_message = format!("~{spaces}{welcome_message}");
         welcome_message.truncate(width);
         Terminal::print(welcome_message)?;
@@ -85,29 +88,18 @@ impl Editor {
         // versione del tutorial
         for current_row in 0..height {
             Terminal::clear_line()?;
+            // we allow this since we don't care if our welcome message is put _exactly_ in the middle.
+            // it's allowed to be a bit up or down
+            #[allow(clippy::integer_division)]
             if current_row == height / 3 {
                 Self::draw_welcome_message()?;
             } else {
                 Self::draw_empty_row()?;
             }
-            
-            if current_row + 1 < height {
+            if current_row.saturating_add(1) < height {
                 Terminal::print("\r\n")?;
             }
         }
-
-        Ok(())
-    }
-
-    // draw the application name centered at 1/3 height of screen
-    // my solution, not used
-    fn draw_credits() -> Result<(), Error> {
-        let Size{height, width} = Terminal::size()?;
-        let caption = "Hecto v0.1";
-        let target_row: u16 = (height / 3) as u16;
-        let target_column: u16 = ((width / 2) - (caption.len() as u16 / 2)) as u16;
-        Terminal::move_cursor_to(Position {x: target_column, y: target_row})?;
-        Terminal::print(caption)?;
 
         Ok(())
     }
